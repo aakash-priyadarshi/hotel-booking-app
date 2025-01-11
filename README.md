@@ -17,7 +17,7 @@ A full-stack application for hotel room booking management built with React, Nod
 ## Setup
 1. Clone repository
 ```bash
-git clone [repository-url]
+git clone https://github.com/aakash-priyadarshi/hotel-booking-app
 cd hotel-booking-app
 ```
 
