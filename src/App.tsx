@@ -1,10 +1,10 @@
+// src/App.tsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navbar from './components/Navbar';
 import BookingForm from './components/BookingForm';
 import BookingDetails from './components/BookingDetails';
 import GuestList from './components/GuestList';
-import ModifyBooking from './components/ModifyBooking';
 
 const queryClient = new QueryClient();
 
@@ -19,7 +19,6 @@ const App = () => {
               <Route path="/" element={<BookingForm />} />
               <Route path="/bookings" element={<BookingDetails />} />
               <Route path="/guests" element={<GuestList />} />
-              <Route path="/modify" element={<ModifyBooking />} />
             </Routes>
           </main>
         </div>

@@ -21,3 +21,8 @@ export const modifyBooking = async (data: any) => {
   const response = await axios.put(`${API_URL}/bookings`, data);
   return response.data;
 };
+
+export const cancelBooking = async (id: string) => {
+  const response = await axios.delete(`${API_URL}/bookings/${id}`);
+  return response.data;
+};

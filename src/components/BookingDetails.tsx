@@ -1,14 +1,30 @@
+// src/components/BookingDetails.tsx
 import { useState } from 'react';
-import { useGetBooking } from '../hooks/useBookings';
+import { useGetBooking, useCancelBooking } from '../hooks/useBookings';
+import ModifyBooking from './ModifyBooking';
 
 const BookingDetails = () => {
   const [email, setEmail] = useState('');
   const [submittedEmail, setSubmittedEmail] = useState('');
   const { data: bookings, isLoading, error } = useGetBooking(submittedEmail);
+  const cancelBookingMutation = useCancelBooking();
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmittedEmail(email); // Trigger the query with the submitted email
+    setSubmittedEmail(email);
+  };
+
+  const handleCancel = (id: string) => {
+    cancelBookingMutation.mutate(id);
+  };
+
+  const handleModify = (booking: any) => {
+    setSelectedBooking(booking);
+  };
+
+  const handleCloseModify = () => {
+    setSelectedBooking(null);
   };
 
   return (
@@ -33,56 +49,42 @@ const BookingDetails = () => {
         </button>
       </form>
 
-      {isLoading && <p className="mt-4">Loading...</p>}
-      {error && <p className="mt-4 text-red-500">Error finding booking</p>}
-      {bookings && bookings.length > 0 ? (
+      {isLoading && <p>Loading...</p>}
+      {error && <p>Error: {error.message}</p>}
+      {bookings && bookings.length > 0 && (
         <div className="mt-6">
-          <h3 className="font-bold mb-2">Booking Information</h3>
-          <table className="table-auto w-full border-collapse border border-gray-300">
-            <tbody>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2 font-bold">Name</td>
-                <td className="border border-gray-300 px-4 py-2">{bookings[0].name}</td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2 font-bold">Email</td>
-                <td className="border border-gray-300 px-4 py-2">{bookings[0].email}</td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2 font-bold">Phone</td>
-                <td className="border border-gray-300 px-4 py-2">{bookings[0].phone}</td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2 font-bold">Check-in</td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {new Date(bookings[0].checkIn).toLocaleDateString()}
-                </td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2 font-bold">Check-out</td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {new Date(bookings[0].checkOut).toLocaleDateString()}
-                </td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2 font-bold">Room Number</td>
-                <td className="border border-gray-300 px-4 py-2">{bookings[0].roomNumber}</td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2 font-bold">Status</td>
-                <td className="border border-gray-300 px-4 py-2">{bookings[0].status}</td>
-              </tr>
-            </tbody>
-          </table>
+          {bookings.map((booking) => (
+            <div key={booking._id} className="border p-4 rounded mb-4">
+              <p><strong>Booking ID:</strong> {booking._id}</p>
+              <p><strong>Name:</strong> {booking.name}</p>
+              <p><strong>Email:</strong> {booking.email}</p>
+              <p><strong>Phone:</strong> {booking.phone}</p>
+              <p><strong>Check-in:</strong> {new Date(booking.checkIn).toLocaleDateString()}</p>
+              <p><strong>Check-out:</strong> {new Date(booking.checkOut).toLocaleDateString()}</p>
+              <p><strong>Room Number:</strong> {booking.roomNumber}</p>
+              <p><strong>Status:</strong> {booking.status}</p>
+              <div className="flex gap-4 mt-4">
+                <button
+                  onClick={() => handleModify(booking)}
+                  className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600"
+                >
+                  Modify
+                </button>
+                <button
+                  onClick={() => handleCancel(booking._id)}
+                  className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-      ) : (
-        !isLoading &&
-        submittedEmail && ( // Only show this message after form submission
-          <p className="mt-4 text-gray-500">No booking data found for the entered email.</p>
-        )
+      )}
+
+      {selectedBooking && (
+        <ModifyBooking booking={selectedBooking} onClose={handleCloseModify} />
       )}
     </div>
   );
 };
-
-export default BookingDetails;
