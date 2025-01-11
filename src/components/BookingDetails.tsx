@@ -2,24 +2,35 @@
 import { useState } from 'react';
 import { useGetBooking, useCancelBooking } from '../hooks/useBookings';
 import ModifyBooking from './ModifyBooking';
+import { AlertDialog } from './ui/AlertDialog';
+import { Booking } from '../types/booking';
 
-const BookingDetails = () => {
+
+export const BookingDetails = () => {
   const [email, setEmail] = useState('');
   const [submittedEmail, setSubmittedEmail] = useState('');
   const { data: bookings, isLoading, error } = useGetBooking(submittedEmail);
   const cancelBookingMutation = useCancelBooking();
-  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [bookingToCancel, setBookingToCancel] = useState<Booking | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmittedEmail(email);
   };
 
-  const handleCancel = (id: string) => {
-    cancelBookingMutation.mutate(id);
+  const handleCancelClick = (booking: Booking) => {
+    setBookingToCancel(booking);
   };
 
-  const handleModify = (booking: any) => {
+  const handleCancelConfirm = () => {
+    if (bookingToCancel) {
+      cancelBookingMutation.mutate(bookingToCancel._id);
+      setBookingToCancel(null);
+    }
+  };
+
+  const handleModify = (booking: Booking) => {
     setSelectedBooking(booking);
   };
 
@@ -71,7 +82,7 @@ const BookingDetails = () => {
                   Modify
                 </button>
                 <button
-                  onClick={() => handleCancel(booking._id)}
+                  onClick={() => handleCancelClick(booking)}
                   className="bg-red-500 text-white p-2 rounded hover:bg-red-600"
                 >
                   Cancel
@@ -82,9 +93,25 @@ const BookingDetails = () => {
         </div>
       )}
 
+      <AlertDialog
+        isOpen={!!bookingToCancel}
+        onClose={() => setBookingToCancel(null)}
+        onConfirm={handleCancelConfirm}
+        title="Cancel Booking"
+        description={
+          bookingToCancel
+            ? `Are you sure you want to cancel the booking for ${bookingToCancel.name} in Room ${bookingToCancel.roomNumber}? This action cannot be undone.`
+            : ''
+        }
+        cancelText="No, keep booking"
+        confirmText="Yes, cancel booking"
+      />
+
       {selectedBooking && (
         <ModifyBooking booking={selectedBooking} onClose={handleCloseModify} />
       )}
     </div>
   );
 };
+
+export default BookingDetails;

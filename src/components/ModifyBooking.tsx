@@ -1,23 +1,27 @@
-// src/components/ModyfyBooking.tsx
+// src/components/ModifyBooking.tsx
 import { useState } from 'react';
 import { useModifyBooking } from '../hooks/useBookings';
 
+interface Booking {
+  _id: string;
+  email: string;
+  checkIn: string;
+  checkOut: string;
+  name: string;
+  roomNumber: string;
+}
+
 interface ModifyBookingProps {
-  booking: {
-    id: string;
-    email: string;
-    checkIn: string;
-    checkOut: string;
-  };
+  booking: Booking;
   onClose: () => void;
 }
 
 const ModifyBooking: React.FC<ModifyBookingProps> = ({ booking, onClose }) => {
   const [formData, setFormData] = useState({
     email: booking.email,
-    bookingId: booking.id,
-    checkIn: booking.checkIn,
-    checkOut: booking.checkOut,
+    bookingId: booking._id,
+    checkIn: new Date(booking.checkIn).toISOString().split('T')[0],
+    checkOut: new Date(booking.checkOut).toISOString().split('T')[0],
   });
 
   const modifyMutation = useModifyBooking();
@@ -44,7 +48,7 @@ const ModifyBooking: React.FC<ModifyBookingProps> = ({ booking, onClose }) => {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full p-2 border rounded"
-              required
+              disabled
             />
           </div>
           <div>
@@ -52,9 +56,8 @@ const ModifyBooking: React.FC<ModifyBookingProps> = ({ booking, onClose }) => {
             <input
               type="text"
               value={formData.bookingId}
-              onChange={(e) => setFormData({ ...formData, bookingId: e.target.value })}
               className="w-full p-2 border rounded"
-              required
+              disabled
             />
           </div>
           <div>
@@ -77,20 +80,23 @@ const ModifyBooking: React.FC<ModifyBookingProps> = ({ booking, onClose }) => {
               required
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-            disabled={modifyMutation.isPending}
-          >
-            {modifyMutation.isPending ? 'Updating...' : 'Update Booking'}
-          </button>
+          <div className="flex gap-4">
+            <button
+              type="submit"
+              className="flex-1 bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+              disabled={modifyMutation.isPending}
+            >
+              {modifyMutation.isPending ? 'Updating...' : 'Update Booking'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
-        <button
-          onClick={onClose}
-          className="mt-4 w-full bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
-        >
-          Cancel
-        </button>
       </div>
     </div>
   );
