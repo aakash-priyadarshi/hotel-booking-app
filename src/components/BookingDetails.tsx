@@ -3,11 +3,12 @@ import { useGetBooking } from '../hooks/useBookings';
 
 const BookingDetails = () => {
   const [email, setEmail] = useState('');
-  const { data: booking, isLoading, error } = useGetBooking(email);
+  const [submittedEmail, setSubmittedEmail] = useState('');
+  const { data: bookings, isLoading, error } = useGetBooking(submittedEmail);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Query will automatically run when email changes
+    setSubmittedEmail(email); // Trigger the query with the submitted email
   };
 
   return (
@@ -34,13 +35,51 @@ const BookingDetails = () => {
 
       {isLoading && <p className="mt-4">Loading...</p>}
       {error && <p className="mt-4 text-red-500">Error finding booking</p>}
-      {booking && (
+      {bookings && bookings.length > 0 ? (
         <div className="mt-6">
           <h3 className="font-bold mb-2">Booking Information</h3>
-          <pre className="bg-gray-100 p-4 rounded">
-            {JSON.stringify(booking, null, 2)}
-          </pre>
+          <table className="table-auto w-full border-collapse border border-gray-300">
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-bold">Name</td>
+                <td className="border border-gray-300 px-4 py-2">{bookings[0].name}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-bold">Email</td>
+                <td className="border border-gray-300 px-4 py-2">{bookings[0].email}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-bold">Phone</td>
+                <td className="border border-gray-300 px-4 py-2">{bookings[0].phone}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-bold">Check-in</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {new Date(bookings[0].checkIn).toLocaleDateString()}
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-bold">Check-out</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {new Date(bookings[0].checkOut).toLocaleDateString()}
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-bold">Room Number</td>
+                <td className="border border-gray-300 px-4 py-2">{bookings[0].roomNumber}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-bold">Status</td>
+                <td className="border border-gray-300 px-4 py-2">{bookings[0].status}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      ) : (
+        !isLoading &&
+        submittedEmail && ( // Only show this message after form submission
+          <p className="mt-4 text-gray-500">No booking data found for the entered email.</p>
+        )
       )}
     </div>
   );
