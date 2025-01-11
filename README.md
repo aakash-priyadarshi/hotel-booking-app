@@ -52,6 +52,11 @@ hotel-booking-app/
 │   └── routes/       # Backend API routes
 ```
 
-## Contributing
-Pull requests welcome. For major changes, please open an issue first.
+## Running Test Cases
+To run the test cases.
+
+```
+cd tests
+
+go test -v
 ```
